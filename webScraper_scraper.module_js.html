@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>createPDF/buildTableBody.js - Documentation</title>
+    <title>webScraper/scraper.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -34,90 +34,287 @@
 
 <div id="main">
     
-    <h1 class="page-title">createPDF/buildTableBody.js</h1>
+    <h1 class="page-title">webScraper/scraper.js</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @file buildTableBody.js
- * @description Builds the content for the PDF tables containing all Pony data
- * @module buildTableBody
- */
+</header>
 
-const { checkPhotoStatus } = require("../util/helpers");
-const { topHeader, bottomHeader, tableRow } = require("./tableHeader");
+<article>
+    
+        <div class="container-overview">
+        
+            
 
-/**
- * Used to build the PDF table body with columns and Registered Pony Information
- * @param { !PonyList } ponyList List of pony data from the DB
- * @param { !string[] } columnNames String [] of column names
- * @returns { (string[] | tableRow[]) } Array of string [] to populate each row with pony information
- */
+<dl class="details">
 
-const buildTableBody = (ponyList, columnNames) => {
-  const body = [topHeader, bottomHeader];
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="webScraper_scraper.js.html">webScraper/scraper.js</a>, <a href="webScraper_scraper.js.html#line4">line 4</a>
+    </li></ul></dd>
+    
 
-  ponyList.forEach((row) => {
-    /**
-     * @const tableRow
-     * @type {tableRow}
-     * @description Using table row is fine using only a string as a column value
-     * @examples ["Name", "Age", ...]
-     * @examples OR
-     * @examples [{ text: "Name", alignment: "center" }, ...]
-     */
+    
 
-    const tableRow = [];
+    
 
-    columnNames.forEach((col) => {
-      // If column is === "Img", and the pony has a photo listed
-      // we assign the camera image with the link for the URL
-      // else we just push an empty string into column
-      if (col === "Img") {
-        const string = checkPhotoStatus(row[col]);
-        if (string === "") {
-          tableRow.push({ text: row[col] });
-        } else {
-          tableRow.push({
-            image: string,
-            width: 15,
-            height: 15,
-            alignment: "center",
-            link: row[col],
-          });
-        }
-        // If column !== "Img", we push the data for that column
-        // Client wanted these columns centered
-      } else if (
-        col === "Status" ||
-        col === "NPS#" ||
-        col === "Sex" ||
-        col === "SNPS#" ||
-        col === "DNPS#"
-      ) {
-        tableRow.push({ text: row[col], alignment: "center" });
-        // Remainder of columns are left aligned
-      } else {
-        tableRow.push({ text: row[col], alignment: "left" });
-      }
-    });
+    
 
-    body.push(tableRow);
-  });
+    
 
-  return body;
-};
+    
 
-exports.buildTableBody = buildTableBody;
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Uses the web URL to pull in the HTML DOM elements and searches for the class=&quot;button&quot; used as View Image</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="~url"><span class="type-signature">(inner, constant) </span>url<span class="type-signature"> :string</span></h4>
+
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="webScraper_scraper.js.html">webScraper/scraper.js</a>, <a href="webScraper_scraper.js.html#line10">line 10</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~fetchAvailableImages"><span class="type-signature">(async, inner) </span>fetchAvailableImages<span class="signature">()</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;string>>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="webScraper_scraper.js.html">webScraper/scraper.js</a>, <a href="webScraper_scraper.js.html#line17">line 17</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>axios makes the HTTP request to the webpage and cheerio acts the same as JQuery to traverse the DOM elements.
+The href from the link is '#popup###' so we use <string>.slice to just return the actual NPS number</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>An array of pony NPS numbers who have an image associated with them on the lineage page.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array.&lt;string>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

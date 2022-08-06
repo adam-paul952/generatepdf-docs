@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>createPDF/buildTableBody.js - Documentation</title>
+    <title>webScraper/scraper.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -34,7 +34,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">createPDF/buildTableBody.js</h1>
+    <h1 class="page-title">webScraper/scraper.js</h1>
     
 
     
@@ -44,77 +44,47 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @file buildTableBody.js
- * @description Builds the content for the PDF tables containing all Pony data
- * @module buildTableBody
- */
-
-const { checkPhotoStatus } = require("../util/helpers");
-const { topHeader, bottomHeader, tableRow } = require("./tableHeader");
+            <pre class="prettyprint source linenums"><code>const axios = require("axios");
+const cheerio = require("cheerio");
 
 /**
- * Used to build the PDF table body with columns and Registered Pony Information
- * @param { !PonyList } ponyList List of pony data from the DB
- * @param { !string[] } columnNames String [] of column names
- * @returns { (string[] | tableRow[]) } Array of string [] to populate each row with pony information
+ * @file scraper.js
+ * @description Uses the web URL to pull in the HTML DOM elements and searches for the class="button" used as View Image
+ * @exports fetchAvailableImages
  */
 
-const buildTableBody = (ponyList, columnNames) => {
-  const body = [topHeader, bottomHeader];
+/**
+ * @const url
+ * @type string
+ */
 
-  ponyList.forEach((row) => {
-    /**
-     * @const tableRow
-     * @type {tableRow}
-     * @description Using table row is fine using only a string as a column value
-     * @examples ["Name", "Age", ...]
-     * @examples OR
-     * @examples [{ text: "Name", alignment: "center" }, ...]
-     */
+const url = `https://newfoundlandpony.com/lineage/`;
 
-    const tableRow = [];
+/**
+ * @async
+ * @function fetchAvailableImages
+ * @description axios makes the HTTP request to the webpage and cheerio acts the same as JQuery to traverse the DOM elements.
+ * The href from the link is '#popup###' so we use &lt;string>.slice to just return the actual NPS number
+ * @returns { Promise.&lt;string[]> } An array of pony NPS numbers who have an image associated with them on the lineage page.
+ */
 
-    columnNames.forEach((col) => {
-      // If column is === "Img", and the pony has a photo listed
-      // we assign the camera image with the link for the URL
-      // else we just push an empty string into column
-      if (col === "Img") {
-        const string = checkPhotoStatus(row[col]);
-        if (string === "") {
-          tableRow.push({ text: row[col] });
-        } else {
-          tableRow.push({
-            image: string,
-            width: 15,
-            height: 15,
-            alignment: "center",
-            link: row[col],
-          });
-        }
-        // If column !== "Img", we push the data for that column
-        // Client wanted these columns centered
-      } else if (
-        col === "Status" ||
-        col === "NPS#" ||
-        col === "Sex" ||
-        col === "SNPS#" ||
-        col === "DNPS#"
-      ) {
-        tableRow.push({ text: row[col], alignment: "center" });
-        // Remainder of columns are left aligned
-      } else {
-        tableRow.push({ text: row[col], alignment: "left" });
-      }
-    });
-
-    body.push(tableRow);
-  });
-
-  return body;
+const fetchAvailableImages = async () => {
+  return await axios(url)
+    .then((res) => {
+      const html = res.data;
+      const $ = cheerio.load(html);
+      const button = $(".button")
+        .map((_, item) => $(item).attr("href"))
+        .toArray();
+      const currentPhotos = button.map((link) => {
+        return link.slice(6, 9);
+      });
+      return currentPhotos;
+    })
+    .catch((err) => console.log(err));
 };
 
-exports.buildTableBody = buildTableBody;
+exports.fetchAvailableImages = fetchAvailableImages;
 </code></pre>
         </article>
     </section>
